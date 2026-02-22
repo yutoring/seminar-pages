@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セミナー事務局自動化システム - 1行書くだけで完了</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <script>
+        /**
+         * ====================================================
+         * COLOR PALETTE (Derived from Content Themes)
+         * ====================================================
+         * 
+         * 1. PRIMARY: Deep Indigo (#4338ca / indigo-600)
+         *    - Concept: Trust, Professionalism, Systematic "Secretary"
+         *    - Keywords: "デジタル秘書", "自動化", "システム"
+         *
+         * 2. ACCENT: Warm Amber (#f59e0b / amber-500)
+         *    - Concept: Passion, Human Connection, Teaching
+         *    - Keywords: "講義への集中", "情熱", "あなた専属"
+         *
+         * 3. NEUTRAL: Warm Gray (gray-900 for text, gray-50 for bg)
+         *    - Concept: Calm, Stress-Free, Clarity
+         *    - Keywords: "ストレスフリー", "シンプル", "1行"
+         *
+         * 4. SUCCESS: LINE Green (#06C755)
+         *    - Required for LINE integration feature
+         * ====================================================
+         */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5', /* Main */
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        accent: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b', /* Main */
+                            600: '#d97706',
+                            700: '#b45309',
+                        },
+                        line: '#06C755',
+                    },
+                    fontFamily: {
+                        sans: ['"Zen Kaku Gothic New"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white border-b border-gray-200">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center text-white font-black text-sm">
+                    SA</div>
+                <span class="font-bold text-lg text-gray-800">Seminar AutoReply</span>
+            </div>
+            <a href="#contact"
+                class="hidden sm:inline-block px-5 py-2.5 rounded-lg bg-primary-600 text-white font-bold text-sm shadow-md hover:bg-primary-700 transition-colors">
+                資料請求
+            </a>
+        </div>
+    </nav>
+
+    <!-- 1. HERO -->
+    <header class="pt-28 pb-20 lg:pt-40 lg:pb-28 bg-white border-b border-gray-100">
+        <div class="max-w-5xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 font-bold text-xs mb-6 border border-primary-100">
+                    <span class="w-2 h-2 rounded-full bg-primary-500"></span>
+                    事務作業の自動化
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-black leading-tight mb-6 text-gray-900 tracking-tight">
+                    事務連絡は、<br>
+                    <span class="text-primary-600">「彼」</span>に任せてください。
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                    セミナーの予定が決まったら、<strong class="text-gray-900 bg-accent-100 px-1 rounded">スプレッドシートに1行書くだけ</strong>。<br>
+                    フォーム作成、入金管理、リマインド。<br>
+                    すべて自動化し、あなたは<span class="text-accent-600 font-bold">「講義」</span>だけに集中できます。
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#contact"
+                        class="px-8 py-4 rounded-lg bg-primary-600 text-white font-bold text-lg shadow-lg shadow-primary-500/20 hover:bg-primary-700 transition-all text-center">
+                        資料を請求する (無料)
+                    </a>
+                    <a href="#solution"
+                        class="px-8 py-4 rounded-lg bg-white border-2 border-gray-200 text-gray-700 font-bold text-lg hover:border-primary-300 hover:text-primary-700 transition-colors text-center">
+                        機能を見る
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl p-6 lg:p-8">
+                    <img src="./assets/digital_secretary.png" alt="Digital Secretary"
+                        class="w-full h-auto rounded-xl shadow-lg">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. PAIN -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">The Problem</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2">
+                    本来やりたい「講義」よりも、<br>事務作業をしていませんか？
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-8 rounded-xl border border-gray-200 hover:border-primary-200 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-2xl mb-5">
+                        🤯</div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-3">管理が煩雑でミスが怖い</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        「この人に入金メール送ったっけ？」<br>
+                        複数のセミナーを並行開催していると、確認作業だけで疲弊します。
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-xl border border-gray-200 hover:border-primary-200 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-2xl mb-5">
+                        💸</div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-3">お金の連絡がストレス</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        未入金者への催促は気まずいもの。<br>
+                        誰から入金があったか、通帳とリストを目視で突き合わせるのも限界です。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. SOLUTION / MECHANISM -->
+    <section id="solution" class="py-20 bg-white border-y border-gray-100">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold text-primary-500 uppercase tracking-widest">Solution</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2">
+                    あなたのやることは、<br><span class="text-primary-600">「たったの1つ」</span>だけ。
+                </h2>
+            </div>
+
+            <div class="bg-primary-800 rounded-2xl p-8 lg:p-12 text-white">
+                <div class="grid lg:grid-cols-2 gap-10 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">マスタシートに書き込むだけ。</h3>
+                        <p class="text-primary-200 mb-6 leading-relaxed">
+                            開催日、タイトル、場所、定員を入力すると、<br>自動でフォームが生成され、受付が始まります。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 text-sm">
+                                <span
+                                    class="w-6 h-6 rounded-full bg-primary-700 text-primary-200 flex items-center justify-center font-bold">1</span>
+                                フォーム自動生成
+                            </li>
+                            <li class="flex items-center gap-3 text-sm">
+                                <span
+                                    class="w-6 h-6 rounded-full bg-primary-700 text-primary-200 flex items-center justify-center font-bold">2</span>
+                                自動返信メールセット
+                            </li>
+                            <li class="flex items-center gap-3 text-sm">
+                                <span
+                                    class="w-6 h-6 rounded-full bg-primary-700 text-primary-200 flex items-center justify-center font-bold">3</span>
+                                入金・リマインド自動管理
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Spreadsheet Mockup -->
+                    <div class="bg-white rounded-lg overflow-hidden text-gray-900 shadow-xl">
+                        <div class="bg-green-600 px-4 py-2 text-white text-xs font-bold">Seminar_Master_Sheet</div>
+                        <div class="p-4">
+                            <table class="w-full text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-gray-200 p-2">日付</th>
+                                        <th class="border border-gray-200 p-2">セミナー名</th>
+                                        <th class="border border-gray-200 p-2">場所</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-200 p-2">2026/03/10</td>
+                                        <td class="border border-gray-200 p-2">PCM Basic</td>
+                                        <td class="border border-gray-200 p-2">大阪</td>
+                                    </tr>
+                                    <tr class="bg-primary-50">
+                                        <td class="border border-gray-200 p-2 font-bold text-primary-700">2026/04/15
+                                        </td>
+                                        <td class="border border-gray-200 p-2">PCM Advanced</td>
+                                        <td class="border border-gray-200 p-2">東京</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-center text-[10px] text-gray-400 mt-3">↑ ここに入力するだけで準備完了</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-features -->
+            <div class="grid md:grid-cols-2 gap-6 mt-10">
+                <div
+                    class="p-6 rounded-xl border border-gray-200 flex gap-4 items-start hover:shadow-md transition-shadow">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-line/10 text-line flex items-center justify-center text-xl flex-shrink-0">
+                        💬</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 mb-1">LINE連携で見逃しゼロ</h4>
+                        <p class="text-gray-500 text-sm">申込完了通知やリマインドをLINEに送信。開封率90%超。</p>
+                    </div>
+                </div>
+                <div
+                    class="p-6 rounded-xl border border-gray-200 flex gap-4 items-start hover:shadow-md transition-shadow">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-xl flex-shrink-0">
+                        🔔</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 mb-1">申込通知もリアルタイム</h4>
+                        <p class="text-gray-500 text-sm">申込があるたびに管理者LINEに通知。画面リロード不要。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. IMPACT -->
+    <section class="py-20 bg-accent-50/50 border-b border-accent-100">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="text-xs font-bold text-accent-600 uppercase tracking-widest">Impact</span>
+                <h2 class="text-3xl font-black text-gray-900 mt-2">圧倒的な導入効果</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white p-8 rounded-xl border border-accent-100 shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 mb-1">事務作業時間</p>
+                    <p class="text-5xl font-black text-gray-900">0<span class="text-lg">分</span></p>
+                    <p class="text-sm text-accent-600 font-bold mt-2">月15時間 → ほぼゼロへ</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl border-2 border-accent-300 shadow-lg transform md:-translate-y-2">
+                    <p class="text-xs font-bold text-gray-400 mb-1">LINE開封率</p>
+                    <p class="text-5xl font-black text-accent-600">90<span class="text-lg">%</span></p>
+                    <p class="text-sm text-gray-600 font-bold mt-2">メールの3倍以上</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl border border-accent-100 shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 mb-1">精神的ストレス</p>
+                    <p class="text-5xl font-black text-gray-900">Free</p>
+                    <p class="text-sm text-accent-600 font-bold mt-2">催促からの解放</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SOCIAL PROOF -->
+    <section class="py-20 bg-white">
+        <div class="max-w-3xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Voice</span>
+                <h2 class="text-2xl font-bold text-gray-900 mt-2">導入企業の声</h2>
+            </div>
+            <div class="bg-gray-50 p-8 lg:p-10 rounded-2xl border border-gray-100">
+                <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                    「本当に、事務作業がゼロになりました。<br>
+                    導入前は、誰が入金済みで、誰にリマインドを送るべきかを確認するだけで疲れていました。<br>
+                    今は、LINEの通知を見るだけ。講義の準備に戻るだけです。」
+                </p>
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-lg">
+                        T</div>
+                    <div>
+                        <p class="font-bold text-gray-900">T 様</p>
+                        <p class="text-sm text-gray-500">PCM認定トレーナー</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. CTA -->
+    <section id="contact" class="py-20 bg-primary-800 text-white">
+        <div class="max-w-3xl mx-auto px-6 text-center">
+            <h2 class="text-3xl lg:text-4xl font-black mb-6">
+                あなたのビジネスにも、<br><span class="text-accent-300">「デジタル秘書」</span>を。
+            </h2>
+            <p class="text-primary-200 mb-10">
+                導入から運用開始まで、手厚くサポートします。<br>
+                まずは詳細な機能と価格表をご覧ください。
+            </p>
+            <div class="bg-primary-900/50 p-6 rounded-xl max-w-md mx-auto border border-primary-700">
+                <form>
+                    <input type="email" placeholder="メールアドレス"
+                        class="w-full bg-white/10 border border-primary-600 rounded-lg px-4 py-3 mb-4 text-white placeholder-primary-300 focus:outline-none focus:border-accent-400 transition">
+                    <button type="button"
+                        class="w-full bg-accent-500 hover:bg-accent-400 text-white font-bold py-4 rounded-lg shadow-lg transition-colors">
+                        無料資料を請求する
+                    </button>
+                    <p class="text-xs text-primary-400 mt-3">1分で完了。無理な勧誘はありません。</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-6 bg-primary-900 text-center text-primary-400 text-xs">
+        <p>&copy; 2026 Seminar Auto Reply System.</p>
+    </footer>
+
+</body>
+
+</html>

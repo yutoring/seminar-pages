@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>セミナー一覧</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      /* Lighter, more pastel aurora gradient for better contrast */
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Header Section (Liquid Glass) */
+    header {
+      background: rgba(255, 255, 255, 0.6);
+      /* Increased opacity for legibility */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+      /* Dark text for contrast against light glass */
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      /* Remove strong shadow on text */
+    }
+
+    /* PCM Dots */
+    .pcm-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .Thinker {
+      background-color: #1a73e8;
+    }
+
+    .Persister {
+      background-color: #9c27b0;
+    }
+
+    .Promoter {
+      background-color: #f44336;
+    }
+
+    .Harmonizer {
+      background-color: #ff9800;
+    }
+
+    .Imaginer {
+      background-color: #795548;
+    }
+
+    .Rebel {
+      background-color: #fdd835;
+    }
+
+    /* Container */
+    #app {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 16px 40px 16px;
+    }
+
+    #debug {
+      background: rgba(0, 0, 0, 0.85);
+      color: #0f0;
+      font-size: 11px;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 180px;
+      overflow-y: scroll;
+      z-index: 9999;
+      display: none;
+    }
+
+    /* Card Design (Liquid Glass - High Contrast) */
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      /* Much whiter background for readability */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
+      position: relative;
+      overflow: hidden;
+      color: #2c3e50;
+    }
+
+    /* Specular Highlight - Subtle */
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom right,
+          rgba(255, 255, 255, 0.9) 0%,
+          rgba(255, 255, 255, 0) 40%);
+      transform: skewX(-20deg);
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    /* VIP UI for Re-attendance (Gira-gira Black & Gold) */
+    .vip-card {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border: 2px solid #e94560;
+      box-shadow: 0 10px 40px rgba(233, 69, 96, 0.4), inset 0 0 20px rgba(233, 69, 96, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      text-align: center;
+      animation: pulse-border-vip 2s infinite;
+    }
+
+    /* Gold/Neon shimmer effect */
+    .vip-card::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 215, 0, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+      transform: rotate(30deg);
+      animation: shimmer 3s infinite linear;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%) rotate(30deg);
+      }
+
+      100% {
+        transform: translateX(100%) rotate(30deg);
+      }
+    }
+
+    @keyframes pulse-border-vip {
+      0% {
+        box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.6), inset 0 0 20px rgba(233, 69, 96, 0.2);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(233, 69, 96, 0), inset 0 0 30px rgba(233, 69, 96, 0.4);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(233, 69, 96, 0), inset 0 0 20px rgba(233, 69, 96, 0.2);
+      }
+    }
+
+    .vip-label {
+      display: inline-block;
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      color: #000;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      letter-spacing: 0.1em;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+      position: relative;
+      z-index: 2;
+    }
+
+    .vip-card h2 {
+      font-size: 24px;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px #e94560;
+      margin: 0 0 12px 0;
+      line-height: 1.3;
+      position: relative;
+      z-index: 2;
+    }
+
+    .vip-card p {
+      font-size: 13.5px;
+      color: #e0e0e0;
+      margin: 0 0 24px 0;
+      line-height: 1.5;
+      position: relative;
+      z-index: 2;
+    }
+
+    .vip-info-grid {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 8px 0;
+      font-size: 13.5px;
+      color: #fff;
+      margin-bottom: 20px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .vip-info-label {
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    .btn-vip {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(135deg, #e94560 0%, #a20a2e 100%);
+      color: white;
+      padding: 16px 0;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 2px solid #ff7b93;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(233, 69, 96, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3);
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-vip:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(233, 69, 96, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, #ff5c77 0%, #c4123c 100%);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
+      background: rgba(255, 255, 255, 0.85);
+      /* Almost opaque on hover */
+      border-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    /* Status Badge */
+    .status-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      z-index: 2;
+    }
+
+    .status-open {
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+      background: #e8f5e9;
+    }
+
+    .status-full {
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      background: #ffebee;
+    }
+
+    .status-wait {
+      color: #616161;
+      border: 1px solid #e0e0e0;
+      background: #f5f5f5;
+    }
+
+    /* Typography */
+    .date {
+      color: #1976d2;
+      /* Strong blue */
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .date::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: #1976d2;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .card h2 {
+      font-size: 19px;
+      margin: 0 0 16px 0;
+      color: #111;
+      /* Almost black for title */
+      line-height: 1.4;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Info Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 8px 0;
+      font-size: 13.5px;
+      color: #333;
+      /* Standard dark grey */
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .comment-box {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      color: #444;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Price Section */
+    .price-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .price-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* Center the first and last items differently */
+    .price-item:first-child {
+      align-items: flex-start;
+    }
+
+    .price-item:last-child {
+      align-items: flex-end;
+    }
+
+    .price-val {
+      font-size: 14px;
+      font-weight: bold;
+      color: #222;
+      margin-top: 2px;
+    }
+
+    /* Button */
+    .btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(135deg, #06c755 0%, #05b34c 100%);
+      color: white;
+      padding: 14px 0;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(6, 199, 85, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(6, 199, 85, 0.3);
+    }
+
+    .btn.disabled {
+      background: #e0e0e0;
+      color: #9e9e9e;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="pcm-dots">
+      <span class="dot Thinker"></span>
+      <span class="dot Persister"></span>
+      <span style="font-size: 14px; line-height: 10px;">❤️</span>
+    </div>
+    <h1>武岡伸幸PCMセミナー</h1>
+    <div class="pcm-dots">
+      <span class="dot Harmonizer"></span>
+      <span class="dot Imaginer"></span>
+      <span class="dot Rebel"></span>
+    </div>
+  </header>
+
+  <div id="app">
+    <div class="loading">読み込み中...</div>
+  </div>
+  <div id="debug">Debug Log:</div>
+
+  <script>
+    // ==========================================
+    // Constants
+    // ==========================================
+    const LIFF_ID = '2009026233-a9Vi8lsj';
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyUjqY83pRshVoWoRJsCTWG8S1oiFLqzxqRZ69NoADNqkl1qnkf8iYyqT80OKskWA0IwA/exec';
+    const FORM_BASE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdvMlF-nnf3qgebUwI4JrcnKddfQgyww16uT2qmM9MxgOb4sg/viewform';
+    // ==========================================
+
+    const ENTRY_SEMINAR = 'entry.100643207'; // SeminarID
+    const ENTRY_USER = 'entry.1734163930'; // UserID
+
+    // 事前入力用 Google Form Entry IDs
+    // ※ Question IDではなくEntry ID（data-paramsの内側のID）を使用すること
+    const ENTRY_COMPANY = 'entry.512004671'; // 御社名（団体名）※任意
+    const ENTRY_LAST_NAME = 'entry.1228820142'; // 苗字
+    const ENTRY_FIRST_NAME = 'entry.1311373621'; // 名前
+    const ENTRY_LAST_NAME_EN = 'entry.1991006458'; // 苗字（アルファベット）
+    const ENTRY_FIRST_NAME_EN = 'entry.884066588'; // 名前 （アルファベット）
+    const ENTRY_SEX = 'entry.1440227199'; // 性別
+    // const ENTRY_BIRTH = 'entry.775334417'; // 生年月日 (日付要素なので分解が必要な場合あり)
+    const ENTRY_ZIP = 'entry.1107386333'; // 郵便番号
+    const ENTRY_PREF = 'entry.16340754'; // 都道府県
+    const ENTRY_CITY = 'entry.20812020'; // 市区町村
+    const ENTRY_ADDR1 = 'entry.517546570'; // 番地
+    const ENTRY_ADDR2 = 'entry.1191090335'; // 建物名
+    const ENTRY_PHONE = 'entry.1066659949'; // 連絡先電話
+
+    // メールアドレスは設定で「入力を求める」となっている専用フィールドのため entry.XXX ではありません
+    const ENTRY_EMAIL = 'emailAddress';
+
+    // Check URL parameter for ?debug=true
+    const urlParams = new URLSearchParams(window.location.search);
+    const IS_DEBUG = urlParams.get('debug') === 'true';
+
+    if (IS_DEBUG) {
+      document.getElementById('debug').style.display = 'block';
+    }
+
+    function log(msg) {
+      console.log(msg);
+      if (IS_DEBUG) {
+        const d = document.getElementById('debug');
+        if (d) d.innerHTML += '\n[' + new Date().toLocaleTimeString() + '] ' + msg;
+      }
+    }
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT after ' + ms + 'ms')), ms))
+      ]);
+    }
+
+    // ==========================================
+    // Main
+    // ==========================================
+    async function main() {
+      try {
+        log('=== main start ===');
+        log('URL: ' + window.location.href);
+        log('Origin: ' + window.location.origin);
+        log('LIFF ID: ' + LIFF_ID);
+
+        // 1. LIFF 初期化
+        log('Calling liff.init...');
+        await withTimeout(liff.init({ liffId: LIFF_ID }), 10000);
+        log('liff.init SUCCESS');
+
+        log('isLoggedIn: ' + liff.isLoggedIn());
+        log('isInClient: ' + liff.isInClient());
+        log('OS: ' + liff.getOS());
+
+        // 2. ログインチェック
+        if (!liff.isLoggedIn()) {
+          log('Not logged in');
+          document.getElementById('app').innerHTML =
+            '<div style="text-align:center; padding:20px;">' +
+            '<p>LINEログインが必要です</p>' +
+            '<button class="btn" onclick="liff.login()">LINEでログイン</button>' +
+            '</div>';
+          return;
+        }
+
+        // 3. プロフィール取得
+        const profile = await liff.getProfile();
+        const userId = profile.userId;
+        log('UserID: ' + userId);
+        log('Name: ' + profile.displayName);
+
+        // 4. セミナー一覧取得
+        loadSeminars(userId);
+
+      } catch (err) {
+        log('ERROR: ' + err.message);
+        if (err.message.includes('TIMEOUT')) {
+          document.getElementById('app').innerHTML =
+            '<p>LIFF初期化がタイムアウトしました。</p>' +
+            '<p style="font-size:12px;color:#999;">LINEアプリ内で開いてください。</p>';
+        } else {
+          document.getElementById('app').innerHTML = '<p>エラー: ' + err.message + '</p>';
+        }
+      }
+    }
+
+    // ==========================================
+    // API呼び出し (Fetch)
+    // ==========================================
+    async function loadSeminars(userId) {
+      log('Fetching seminars and user profile...');
+      try {
+        const [resSeminars, resProfile] = await Promise.all([
+          fetch(GAS_API_URL + '?action=getSeminars'),
+          fetch(GAS_API_URL + '?action=getUserProfileForReattendance&userId=' + encodeURIComponent(userId))
+        ]);
+
+        log('HTTP Status: S=' + resSeminars.status + ' P=' + resProfile.status);
+
+        const seminars = await resSeminars.json();
+        const profileData = await resProfile.json();
+
+        log('Seminars loaded: ' + seminars.length);
+        log('Is Customer: ' + profileData.isCustomer);
+
+        renderList(seminars, userId, profileData);
+
+      } catch (err) {
+        log('Fetch Error: ' + err.message);
+        document.getElementById('app').innerHTML = '<p>データ取得失敗: ' + err.message + '</p>';
+      }
+    }
+
+    // ==========================================
+    // Render (変更なし)
+    // ==========================================
+    function esc(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    function renderList(seminars, userId, profileData) {
+      const app = document.getElementById('app');
+      let html = '';
+
+      // --- 1. VIP BLOCK (過去受講者のみ) ---
+      if (profileData && profileData.isCustomer && profileData.nearestSeminar) {
+        const s = profileData.nearestSeminar;
+        html += `
+            <div class="vip-card">
+               <div class="vip-label">東大阪PCM過去受講者 限定</div>
+               <h2>ワンタップ再受講</h2>
+               <p>過去の受講記録から、直近のセミナーに即座に予約を確定します。<br><span style="color: #ffd700; font-size: 11.5px; opacity: 0.9;">※こちらは「懇親会つき」の専用プレミアム申込枠です。</span></p>
+               
+               <div class="info-grid" style="text-align: left; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 2; color: #fff;">
+                 <div class="info-label" style="color: #aaa;">対象日程</div>
+                 <div style="font-weight: bold; color: #ff9a9e; font-size: 15px;">${esc(s.date)} ${esc(s.time)}</div>
+                 <div class="info-label" style="color: #aaa;">場所</div>
+                 <div>${esc(s.venue)}</div>
+                 <div class="info-label" style="color: #aaa;">プラン</div>
+                 <div>再受講 ＋ 懇親会</div>
+                 <div class="info-label" style="color: #aaa;">合計金額</div>
+                 <div style="font-weight: 900; color: #ffd700; font-size: 17px; text-shadow: 0 0 5px rgba(255,215,0,0.5);">¥${Number((s.fee_repeat || 0) + (s.fee_party || 0)).toLocaleString()}</div>
+               </div>
+
+               <button class="btn-vip" onclick="doDirectBooking('${esc(userId)}', '${esc(s.pid)}')">
+                  🔥 ${esc(s.date.replace(/^[0-9]+年/, ''))} 懇親会つきで再受講する
+               </button>
+            </div>
+            
+            <hr style="border: 0; height: 1px; background: rgba(0,0,0,0.1); margin: 30px 0;">
+            <div style="text-align:center; color: #666; font-size: 13px; margin-bottom: 20px;">その他の日程・「懇親会なし」をご希望の方はこちら</div>
+          `;
+      }
+
+      // --- 2. Normal Seminar List ---
+      if (!seminars || seminars.length === 0) {
+        html += '<p style="text-align:center;">現在募集中のセミナーはありません。</p>';
+        app.innerHTML = html;
+        return;
+      }
+
+      seminars.forEach(s => {
+        let applyUrl = FORM_BASE_URL +
+          '?' + ENTRY_SEMINAR + '=' + encodeURIComponent(s.pid) +
+          '&' + ENTRY_USER + '=' + encodeURIComponent(userId);
+
+        // 事前入力URLの生成（顧客データがある場合）
+        if (profileData && profileData.isCustomer && profileData.profile) {
+          const p = profileData.profile;
+          const addParam = (key, val) => {
+            if (val) applyUrl += '&' + key + '=' + encodeURIComponent(val);
+          };
+          addParam(ENTRY_EMAIL, p['メールアドレス']);
+          addParam(ENTRY_COMPANY, p['御社名（団体名）※任意']);
+          addParam(ENTRY_LAST_NAME, p['苗字']);
+          addParam(ENTRY_FIRST_NAME, p['名前']);
+          addParam(ENTRY_LAST_NAME_EN, p['苗字（アルファベット）']);
+          addParam(ENTRY_FIRST_NAME_EN, p['名前 （アルファベット）']);
+          addParam(ENTRY_SEX, p['性別']);
+          addParam(ENTRY_ZIP, p['郵便番号']);
+          addParam(ENTRY_PREF, p['都道府県']);
+          addParam(ENTRY_CITY, p['市区町村']);
+          addParam(ENTRY_ADDR1, p['番地']);
+          addParam(ENTRY_ADDR2, p['建物名']);
+          addParam(ENTRY_PHONE, p['連絡先電話']);
+        }
+
+        // Status Badge Logic
+        let badgeClass = 'status-wait';
+        if (s.status === '募集中') badgeClass = 'status-open';
+        if (s.status === '満席') badgeClass = 'status-full';
+
+        // Button Logic
+        let btnHtml = '';
+        if (s.status === '募集中') {
+          btnHtml = `<button class="btn" onclick="window.location.href='${applyUrl}'">申し込む</button>`;
+        } else if (s.status === '満席') {
+          btnHtml = `<button class="btn disabled" disabled>満席</button>`;
+        } else if (s.status === '申込前') {
+          btnHtml = `<button class="btn disabled" disabled>申込開始前</button>`;
+        }
+
+        html += `
+            <div class="card">
+              <div class="status-badge ${badgeClass}">${esc(s.status)}</div>
+              <div class="date">${esc(s.date)}</div>
+              <h2>${esc(s.name)}</h2>
+              
+              <div class="info-grid">
+                <div class="info-label">場所</div>
+                <div>${esc(s.venue)}</div>
+                <div class="info-label">時間</div>
+                <div>${esc(s.time)}</div>
+              </div>
+
+              ${s.comment ? `<div class="comment-box">💡 ${esc(s.comment)}</div>` : ''}
+              
+              <div class="price-row">
+                 <div class="price-item">
+                   <span>初受講</span>
+                   <span class="price-val">¥${Number(s.fee_new).toLocaleString()}</span>
+                 </div>
+                 <div class="price-item">
+                   <span>再受講</span>
+                   <span class="price-val">¥${Number(s.fee_repeat).toLocaleString()}</span>
+                 </div>
+                 <div class="price-item">
+                   <span>懇親会</span>
+                   <span class="price-val">¥${Number(s.fee_party || 0).toLocaleString()}</span>
+                 </div>
+              </div>
+
+              ${btnHtml}
+            </div>
+          `;
+      });
+      app.innerHTML = html;
+    }
+
+    // ==========================================
+    // ダイレクト申込機能 (VIPボタン用)
+    // ==========================================
+    async function doDirectBooking(userId, seminarId) {
+      if (!confirm('ワンクリックで直近セミナー（懇親会付き）の予約を確定します。よろしいですか？')) {
+        return;
+      }
+
+      const app = document.getElementById('app');
+      // 現在のHTMLを保持してローディングオーバーレイを出す方が綺麗ですが、今回はシンプルに置換
+      app.innerHTML = '<div class="loading">予約処理中...しばらくお待ちください。</div>';
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'directBooking',
+            userId: userId,
+            seminarId: seminarId
+          })
+        });
+
+        const data = await res.json();
+        if (data.status === 'success') {
+          app.innerHTML = `
+                    <div style="text-align:center; padding: 40px 20px;">
+                        <h2 style="color: #2e7d32;">🎉 予約完了！</h2>
+                        <p style="font-weight: bold; margin-bottom: 20px;">VIPワンクリック予約が完了しました。</p>
+                        <p style="font-size: 14px; color: #555;">システムにて受付処理を行いました。<br>詳細やご案内はLINEまたはメールにてお送りいたします。</p>
+                        <br><br>
+                        <button class="btn" onclick="liff.closeWindow()">画面を閉じる</button>
+                    </div>
+                `;
+        } else {
+          throw new Error(data.error || '不明なエラーが発生しました');
+        }
+      } catch (e) {
+        log('Booking Error: ' + e.message);
+        app.innerHTML = `
+                <div style="text-align:center; padding: 40px 20px;">
+                    <h2 style="color: #c62828;">⚠️ エラー</h2>
+                    <p>予約処理中にシステムエラーが発生しました。</p>
+                    <p style="font-size:12px;color:#666; margin-bottom: 20px;">${e.message}</p>
+                    <button class="btn" onclick="location.reload()">再読み込みしてやり直す</button>
+                </div>
+            `;
+      }
+    }
+
+    // Start
+    main();
+  </script>
+</body>
+
+</html>
