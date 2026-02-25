@@ -712,7 +712,8 @@
         // Button Logic
         let btnHtml = '';
         if (s.status === '募集中') {
-          btnHtml = `<button class="btn" onclick="window.location.href='${applyUrl}'">申し込む</button>`;
+          const btnLabel = s.is_repeat_only ? '再受講を申し込む' : '申し込む';
+          btnHtml = `<button class="btn" onclick="window.location.href='${applyUrl}'">${btnLabel}</button>`;
         } else if (s.status === '満席') {
           btnHtml = `<button class="btn disabled" disabled>満席</button>`;
         } else if (s.status === '申込前') {
@@ -730,6 +731,12 @@
                 <div>${esc(s.venue)}</div>
                 <div class="info-label">時間</div>
                 <div>${esc(s.time)}</div>
+                <div class="info-label">申込期限</div>
+                <div>${esc(s.application_deadline || '-')}</div>
+                <div class="info-label">新規振込期限</div>
+                <div>${esc(s.payment_deadline || '-')}</div>
+                <div class="info-label">PPI申込期限</div>
+                <div>${esc(s.ppi_deadline || '-')}</div>
               </div>
 
               ${s.comment ? `<div class="comment-box">💡 ${esc(s.comment)}</div>` : ''}
