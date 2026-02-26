@@ -430,6 +430,54 @@
       font-weight: 500;
     }
 
+    /* Registration Section */
+    .reg-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .reg-section .section-title {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+
+    .reg-card {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .reg-card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .reg-card p {
+      margin: 0 0 16px;
+      font-size: 12.5px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .btn-reg {
+      display: inline-block;
+      width: 100%;
+      padding: 12px;
+      background: #666;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     /* Price Section */
     .price-row {
       display: grid;
@@ -703,13 +751,17 @@
       }
 
       // --- 2. Normal Seminar List ---
-      if (!seminars || seminars.length === 0) {
+      // 名簿登録用セミナーを分離
+      const regSeminars = seminars ? seminars.filter(s => s.name.includes('名簿登録')) : [];
+      const normalSeminars = seminars ? seminars.filter(s => !s.name.includes('名簿登録')) : [];
+
+      if (normalSeminars.length === 0 && regSeminars.length === 0) {
         html += '<p style="text-align:center;">現在募集中のセミナーはありません。</p>';
         app.innerHTML = html;
         return;
       }
 
-      seminars.forEach(s => {
+      normalSeminars.forEach(s => {
         let applyUrl = FORM_BASE_URL +
           '?' + ENTRY_SEMINAR + '=' + encodeURIComponent(s.pid) +
           '&' + ENTRY_USER + '=' + encodeURIComponent(userId);
@@ -796,6 +848,45 @@
             </div>
           `;
       });
+
+      // --- 3. Registration Section (名簿登録) ---
+      regSeminars.forEach(s => {
+        let regUrl = FORM_BASE_URL +
+          '?' + ENTRY_SEMINAR + '=' + encodeURIComponent(s.pid) +
+          '&' + ENTRY_USER + '=' + encodeURIComponent(userId);
+
+        if (profileData && profileData.isCustomer && profileData.profile) {
+          const p = profileData.profile;
+          const addParam = (key, val) => {
+            if (val) regUrl += '&' + key + '=' + encodeURIComponent(val);
+          };
+          addParam(ENTRY_EMAIL, p['メールアドレス']);
+          addParam(ENTRY_COMPANY, p['御社名（団体名）※任意']);
+          addParam(ENTRY_LAST_NAME, p['苗字']);
+          addParam(ENTRY_FIRST_NAME, p['名前']);
+          addParam(ENTRY_LAST_NAME_EN, p['苗字（アルファベット）']);
+          addParam(ENTRY_FIRST_NAME_EN, p['名前 （アルファベット）']);
+          addParam(ENTRY_SEX, p['性別']);
+          addParam(ENTRY_ZIP, p['郵便番号']);
+          addParam(ENTRY_PREF, p['都道府県']);
+          addParam(ENTRY_CITY, p['市区町村']);
+          addParam(ENTRY_ADDR1, p['番地']);
+          addParam(ENTRY_ADDR2, p['建物名']);
+          addParam(ENTRY_PHONE, p['連絡先電話']);
+        }
+
+        html += `
+          <div class="reg-section">
+            <div class="section-title">過去に受講された方へ</div>
+            <div class="reg-card">
+              <h3>名簿登録</h3>
+              <p>今後のセミナー情報をLINEでお届けするための登録です。<br>受講申込ではありませんのでお気軽にどうぞ。</p>
+              <button class="btn-reg" onclick="window.location.href='${regUrl}'">名簿登録する</button>
+            </div>
+          </div>
+        `;
+      });
+
       app.innerHTML = html;
     }
 
