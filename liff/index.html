@@ -372,12 +372,11 @@
     /* Info Grid */
     .info-grid {
       display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 8px 0;
+      grid-template-columns: auto 1fr;
+      gap: 6px 12px;
       font-size: 13.5px;
       color: #333;
-      /* Standard dark grey */
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       position: relative;
       z-index: 1;
     }
@@ -385,6 +384,7 @@
     .info-label {
       font-weight: bold;
       color: #555;
+      white-space: nowrap;
     }
 
     .comment-box {
@@ -393,21 +393,53 @@
       padding: 10px;
       font-size: 12px;
       color: #444;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       line-height: 1.5;
       border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Deadline Tags */
+    .deadline-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .deadline-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      color: #555;
+    }
+
+    .deadline-tag .dl-label {
+      font-weight: 600;
+      color: #888;
+    }
+
+    .deadline-tag .dl-date {
+      color: #333;
+      font-weight: 500;
     }
 
     /* Price Section */
     .price-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
       background: rgba(255, 255, 255, 0.6);
       border: 1px solid rgba(0, 0, 0, 0.05);
       border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
       position: relative;
       z-index: 1;
     }
@@ -420,7 +452,6 @@
       color: #666;
     }
 
-    /* Center the first and last items differently */
     .price-item:first-child {
       align-items: flex-start;
     }
@@ -720,6 +751,11 @@
           btnHtml = `<button class="btn disabled" disabled>申込開始前</button>`;
         }
 
+        const fmtDeadline = (d) => {
+          if (!d || d === '-') return '';
+          return d.replace(/^\d{4}[\/-]/, '').replace(/[\/-]/g, '/');
+        };
+
         html += `
             <div class="card">
               <div class="status-badge ${badgeClass}">${esc(s.status)}</div>
@@ -731,15 +767,15 @@
                 <div>${esc(s.venue)}</div>
                 <div class="info-label">時間</div>
                 <div>${esc(s.time)}</div>
-                <div class="info-label">申込期限</div>
-                <div>${esc(s.application_deadline || '-')}</div>
-                <div class="info-label">新規振込期限</div>
-                <div>${esc(s.payment_deadline || '-')}</div>
-                <div class="info-label">PPI申込期限</div>
-                <div>${esc(s.ppi_deadline || '-')}</div>
               </div>
 
               ${s.comment ? `<div class="comment-box">💡 ${esc(s.comment)}</div>` : ''}
+
+              <div class="deadline-row">
+                ${s.payment_deadline ? `<div class="deadline-tag"><span class="dl-label">初受講申込&振込期限</span><span class="dl-date">${esc(fmtDeadline(s.payment_deadline))}</span></div>` : ''}
+                ${s.ppi_deadline ? `<div class="deadline-tag"><span class="dl-label">PPI回答期限</span><span class="dl-date">${esc(fmtDeadline(s.ppi_deadline))}</span></div>` : ''}
+                ${s.application_deadline ? `<div class="deadline-tag"><span class="dl-label">再受講申込期限</span><span class="dl-date">${esc(fmtDeadline(s.application_deadline))}</span></div>` : ''}
+              </div>
               
               <div class="price-row">
                  <div class="price-item">
