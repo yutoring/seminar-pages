@@ -683,12 +683,20 @@
     // ==========================================
     // API呼び出し (Fetch)
     // ==========================================
+    // 選択済みメールアドレス（家族共有UID対応用）
+    let selectedEmail = null;
+
     async function loadSeminars(userId) {
       log('Fetching seminars and user profile...');
       try {
+        let profileUrl = GAS_API_URL + '?action=getUserProfileForReattendance&userId=' + encodeURIComponent(userId);
+        if (selectedEmail) {
+          profileUrl += '&email=' + encodeURIComponent(selectedEmail);
+        }
+
         const [resSeminars, resProfile] = await Promise.all([
           fetch(GAS_API_URL + '?action=getSeminars'),
-          fetch(GAS_API_URL + '?action=getUserProfileForReattendance&userId=' + encodeURIComponent(userId))
+          fetch(profileUrl)
         ]);
 
         log('HTTP Status: S=' + resSeminars.status + ' P=' + resProfile.status);
@@ -699,12 +707,41 @@
         log('Seminars loaded: ' + seminars.length);
         log('Is Customer: ' + profileData.isCustomer);
 
+        // 同一UIDに複数人紐づく場合 → 人物選択画面
+        if (profileData.needsSelection && profileData.profiles) {
+          log('Multiple profiles found: ' + profileData.profiles.length);
+          renderProfileSelection(seminars, userId, profileData.profiles);
+          return;
+        }
+
         renderList(seminars, userId, profileData);
 
       } catch (err) {
         log('Fetch Error: ' + err.message);
         document.getElementById('app').innerHTML = '<p>データ取得失敗: ' + err.message + '</p>';
       }
+    }
+
+    function renderProfileSelection(seminars, userId, profiles) {
+      const app = document.getElementById('app');
+      let html = '<div style="text-align:center; padding: 30px 20px;">';
+      html += '<h2 style="margin-bottom: 8px;">どなたのお申込みですか？</h2>';
+      html += '<p style="color: #888; font-size: 13px; margin-bottom: 24px;">同じLINEアカウントに複数の方が登録されています。</p>';
+
+      profiles.forEach(p => {
+        html += `<button class="btn" style="margin-bottom: 12px; width: 100%;" onclick="selectProfile('${esc(p.email)}', '${esc(userId)}')">${esc(p.name)}</button>`;
+      });
+
+      html += '<hr style="border:0; height:1px; background:rgba(0,0,0,0.1); margin: 24px 0;">';
+      html += `<button class="btn" style="background: #888; width: 100%;" onclick="selectProfile('', '${esc(userId)}')">上記以外（新規の方）</button>`;
+      html += '</div>';
+      app.innerHTML = html;
+    }
+
+    async function selectProfile(email, userId) {
+      selectedEmail = email || null;
+      log('Selected profile: ' + (email || '(new)'));
+      loadSeminars(userId);
     }
 
     // ==========================================
@@ -740,7 +777,7 @@
                  <div style="font-weight: 900; color: #ffd700; font-size: 17px; text-shadow: 0 0 5px rgba(255,215,0,0.5);">¥${Number((s.fee_repeat || 0) + (s.fee_party || 0)).toLocaleString()}</div>
                </div>
 
-               <button class="btn-vip" onclick="doDirectBooking('${esc(userId)}', '${esc(s.pid)}')">
+               <button class="btn-vip" onclick="doDirectBooking('${esc(userId)}', '${esc(s.pid)}', selectedEmail)">
                   🔥 ${esc(s.date.replace(/^[0-9]+年/, ''))} 懇親会つきで再受講する
                </button>
             </div>
@@ -893,23 +930,25 @@
     // ==========================================
     // ダイレクト申込機能 (VIPボタン用)
     // ==========================================
-    async function doDirectBooking(userId, seminarId) {
+    async function doDirectBooking(userId, seminarId, email) {
       if (!confirm('ワンクリックで直近セミナー（懇親会付き）の予約を確定します。よろしいですか？')) {
         return;
       }
 
       const app = document.getElementById('app');
-      // 現在のHTMLを保持してローディングオーバーレイを出す方が綺麗ですが、今回はシンプルに置換
       app.innerHTML = '<div class="loading">予約処理中...しばらくお待ちください。</div>';
 
       try {
-        const res = await fetch(GAS_API_URL, {
-          method: 'POST',
-          body: JSON.stringify({
+        const payload = {
             action: 'directBooking',
             userId: userId,
             seminarId: seminarId
-          })
+        };
+        if (email) payload.email = email;
+
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
         });
 
         const data = await res.json();
